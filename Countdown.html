@@ -1,0 +1,537 @@
+
+<!-- saved from url=(0050)http://www.cyram.org/projects/countdown/index.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1255">
+		<title>Countdown</title>
+		<link rel="stylesheet" href="./Countdown_files/claro.css">
+		<!-- load dojo and provide config via data attribute -->
+		<script src="./Countdown_files/dojo.js" data-dojo-config="parseOnLoad:true"></script>
+		
+		<script>
+			// Require the dojox.gfx resource
+			dojo.require("dojox.gfx");
+			dojo.require("dojox.gfx.move");
+			dojo.require("dojox.gfx.fx");
+			
+			var numcount = 0;
+			var target = null;
+			var calculation = "{";
+			var numarr = new Array(6);
+			var numorig = new Array(6);
+			var surface = null;
+			var numstatus = new Array(6);
+			var numbersgrp = new Array(6);
+			var numrect = new Array(6);
+			var targetblock;
+			// Create a ready event
+			dojo.ready(function(){
+				dojox.gfx.renderer = "canvas";
+				// Create a GFX surface
+				// Arguments:  node, width, height
+				surface = dojox.gfx.createSurface("cnumbers",800,500);
+				
+				var addblock = surface.createGroup();
+				var subblock = surface.createGroup();
+				var mulblock = surface.createGroup();
+				var divblock = surface.createGroup();
+				var powblock = surface.createGroup();
+				targetblock = surface.createGroup();
+				for (i=0; i<6; i++) {
+					numbersgrp[i] = surface.createGroup();
+				}
+				
+				//The Addition Group
+				rectadd = addblock.createRect({x: 0, y: 0, width: 260, height: 80, r: 30})
+					.setFill("#88FFDD")
+					.setStroke({width:"2px", color:"black"});
+				addn1 = addblock.createRect({x: 10, y: 15, width: 50, height: 50, r: 10})
+					.setFill("white")
+					.setStroke({width:"2px", color:"black"});
+				addt1 = addblock.createText({x: 65, y: 60, text:"+"})
+					.setFont({family:"Arial", size:"36pt", weight:"bold"})
+					.setFill("black");
+				addn2 = addblock.createRect({x: 100, y: 15, width: 50, height: 50, r: 10})
+					.setFill("white")
+					.setStroke({width:"2px", color:"black"});
+				addt1 = addblock.createText({x: 155, y: 60, text:"="})
+					.setFont({family:"Arial", size:"36pt", weight:"bold"})
+					.setFill("black");
+				addres = addblock.createRect({x: 190, y: 15, width: 50, height: 50, r: 10})
+					.setFill("#BBBBBB")
+					.setStroke({width:"2px", color:"black"});
+				
+				//The Subtraction Group
+				rectsub = subblock.createRect({x: 0, y: 100, width: 260, height: 80, r: 30})
+					.setFill("#88DDFF")
+					.setStroke({width:"2px", color:"black"});
+				subn1 = subblock.createRect({x: 10, y: 115, width: 50, height: 50, r: 10})
+					.setFill("white")
+					.setStroke({width:"2px", color:"black"});
+				subt1 = subblock.createText({x: 70, y: 160, text:"-"})
+					.setFont({family:"Arial", size:"36pt", weight:"bold"})
+					.setFill("black");
+				subn2 = subblock.createRect({x: 100, y: 115, width: 50, height: 50, r: 10})
+					.setFill("white")
+					.setStroke({width:"2px", color:"black"});
+				subt1 = subblock.createText({x: 155, y: 160, text:"="})
+					.setFont({family:"Arial", size:"36pt", weight:"bold"})
+					.setFill("black");
+				subres = subblock.createRect({x: 190, y: 115, width: 50, height: 50, r: 10})
+					.setFill("#BBBBBB")
+					.setStroke({width:"2px", color:"black"});
+					
+				//The Multiplication Group
+				rectmul = mulblock.createRect({x: 0, y: 200, width: 260, height: 80, r: 30})
+					.setFill("#DDFF88")
+					.setStroke({width:"2px", color:"black"});
+				muln1 = mulblock.createRect({x: 10, y: 215, width: 50, height: 50, r: 10})
+					.setFill("white")
+					.setStroke({width:"2px", color:"black"});
+				mult1 = mulblock.createText({x: 65, y: 260, text:"x"})
+					.setFont({family:"Arial", size:"36pt", weight:"bold"})
+					.setFill("black");
+				muln2 = mulblock.createRect({x: 100, y: 215, width: 50, height: 50, r: 10})
+					.setFill("white")
+					.setStroke({width:"2px", color:"black"});
+				mult1 = mulblock.createText({x: 155, y: 260, text:"="})
+					.setFont({family:"Arial", size:"36pt", weight:"bold"})
+					.setFill("black");
+				mulres = mulblock.createRect({x: 190, y: 215, width: 50, height: 50, r: 10})
+					.setFill("#BBBBBB")
+					.setStroke({width:"2px", color:"black"});
+				
+				//The Division Group
+				rectdiv = divblock.createRect({x: 0, y: 300, width: 260, height: 80, r: 30})
+					.setFill("#FFDD88")
+					.setStroke({width:"2px", color:"black"});
+				divn1 = divblock.createRect({x: 10, y: 315, width: 50, height: 50, r: 10})
+					.setFill("white")
+					.setStroke({width:"2px", color:"black"});
+				divt1 = divblock.createText({x: 65, y: 360, text:"ק"})
+					.setFont({family:"Arial", size:"36pt", weight:"bold"})
+					.setFill("black");
+				divn2 = divblock.createRect({x: 100, y: 315, width: 50, height: 50, r: 10})
+					.setFill("white")
+					.setStroke({width:"2px", color:"black"});
+				divt1 = divblock.createText({x: 155, y: 360, text:"="})
+					.setFont({family:"Arial", size:"36pt", weight:"bold"})
+					.setFill("black");
+				divres = divblock.createRect({x: 190, y: 315, width: 50, height: 50, r: 10})
+					.setFill("#BBBBBB")
+					.setStroke({width:"2px", color:"black"});
+				
+				//The Power Group
+				rectpow = powblock.createRect({x: 300, y: 0, width: 240, height: 110, r: 30})
+					.setFill("#FF88DD")
+					.setStroke({width:"2px", color:"black"});
+				pown1 = powblock.createRect({x: 320, y: 55, width: 50, height: 50, r: 10})
+					.setFill("white")
+					.setStroke({width:"2px", color:"black"});
+				pown1 = powblock.createRect({x: 370, y: 5, width: 50, height: 50, r: 10})
+					.setFill("white")
+					.setStroke({width:"2px", color:"black"});
+				powt1 = powblock.createText({x: 430, y: 75, text:"="})
+					.setFont({family:"Arial", size:"36pt", weight:"bold"})
+					.setFill("black");
+				powres = powblock.createRect({x: 470, y: 30, width: 50, height: 50, r: 10})
+					.setFill("#BBBBBB")
+					.setStroke({width:"2px", color:"black"});
+			});
+
+		function addNumber(n) {
+			if (numcount < 6) {
+				numstatus[numcount] = 1;
+				if (n == 1) {
+					newnum = Math.round(Math.random()*90)+11;
+				} else {
+					newnum = Math.round(Math.random()*10)+1;
+				}
+				numarr[numcount] = newnum; 
+				numorig[numcount] = newnum;
+				
+				calculation += newnum + ",";
+				
+				numrect[numcount] = numbersgrp[numcount].createRect({x: 300+(numcount*50), y: 200, width: 45, height: 45, r: 10})
+						.setFill("#AA99FF")
+						.setStroke({width:"2px", color:"black"});
+						
+				numbersgrp[numcount].createText({x: 305+(numcount*50), y: 235, text:newnum})
+						.setFont({family:"Arial", size:"20pt", weight:"bold"})
+						.setFill("black");
+						
+				new dojox.gfx.Moveable(numbersgrp[numcount]);
+				numcount++;
+				if (numcount == 6) {
+					makeTarget();
+					dojo.byId("sn").disabled = true;
+					dojo.byId("ln").disabled = true;
+					dojo.byId("calc").disabled = false;
+					dojo.byId("creset").disabled = false;
+				}
+				
+			} else {
+				alert("No more numbers can be added.");
+			}
+		}
+		
+		function makeTarget() {
+			target = Math.round(Math.random()*250 + 100);
+			calculation += "["+target+"]}";
+			targetblock.createRect({x: 300, y: 300, width: 400, height: 65, r: 10})
+				.setFill("#AAFFAA")
+				.setStroke({width:"2px", color:"black"});
+			targetblock.createText({x: 335, y: 345, text:"Target: "+target})
+				.setFont({family:"Arial", size:"20pt", weight:"bold"})
+				.setFill("black");
+			targetblock.createRect({x: 520, y: 305, width: 50, height: 50, r: 10})
+				.setFill("#FFFFFF")
+				.setStroke({width:"2px", color:"black"});
+			dojo.byId("checkans").style.visibility = "visible";
+		}
+		
+		function calculateNums() {
+			var fsize = 20;
+			var add1 = null;
+			var add2 = null;
+			var sub1 = null;
+			var sub2 = null;
+			var mul1 = null;
+			var mul2 = null;
+			var div1 = null;
+			var div2 = null;
+			var pow1 = null;
+			var pow2 = null;
+			for (i=0; i<6; i++) {
+				if (numstatus[i] == 0) {
+					continue;
+				}
+							
+				if (numstatus[i] != 0) {
+					var temp = numbersgrp[i].children[0].getTransformedBoundingBox();
+					temp = temp[0];
+					//check addition
+					//alert("Shape:"+i+",X:"+temp[0].x+",Y:"+temp[0].y);
+					if (temp.x >= 10 && temp.x <= 15 && temp.y >= 15 && temp.y <= 20) {
+						add1 = i;
+					}
+					if (temp.x >= 100 && temp.x <= 105 && temp.y >= 15 && temp.y <= 20) {
+						add2 = i;
+					}
+					//check subtraction
+					if (temp.x >= 10 && temp.x <= 15 && temp.y >= 115 && temp.y <= 120) {
+						sub1 = i;
+					}
+					if (temp.x >= 100 && temp.x <= 105 && temp.y >= 115 && temp.y <= 120) {
+						sub2 = i;
+					}
+					
+					//check multiplication
+					if (temp.x >= 10 && temp.x <= 15 && temp.y >= 215 && temp.y <= 220) {
+						mul1 = i;
+					}
+					if (temp.x >= 100 && temp.x <= 105 && temp.y >= 215 && temp.y <= 220) {
+						mul2 = i;
+					}
+					
+					//check division
+					if (temp.x >= 10 && temp.x <= 15 && temp.y >= 315 && temp.y <= 320) {
+						div1 = i;
+					}
+					if (temp.x >= 100 && temp.x <= 105 && temp.y >= 315 && temp.y <= 320) {
+						div2 = i;
+					}
+					
+					//Check power
+					if (temp.x >= 320 && temp.x <= 325 && temp.y >= 55 && temp.y <= 60) {
+						pow1 = i;
+					}
+					if (temp.x >= 370 && temp.x <= 375 && temp.y >= 5 && temp.y <= 10) {
+						pow2 = i;
+					}
+				}
+			}
+			//perform addition
+			if (add1 != null && add2 != null) {
+				numbersgrp[add1].clear();
+				numbersgrp[add2].clear();
+				numbersgrp[add1] = null;
+				numbersgrp[add2] = null;
+				numrect[add1] = null;
+				numrect[add2] = null;
+				numstatus[add2] = 0;
+				numstatus[add1] = 2;
+				numbersgrp[add1] = surface.createGroup();
+				
+				numrect[add1] = numbersgrp[add1].createRect({x: 190, y: 17, width: 45, height: 45, r: 10})
+						.setFill("#AA99FF")
+						.setStroke({width:"2px", color:"black"});
+				if (numarr[add1] + numarr[add2] >= 100) {
+					fsize = 14;
+				} else {
+					fsize = 20;
+				}
+				numbersgrp[add1].createText({x: 195, y: 52, text:numarr[add1]+numarr[add2]})
+						.setFont({family:"Arial", size:fsize+"pt", weight:"bold"})
+						.setFill("black");
+				calculation += "{"+numarr[add1]+" + "+numarr[add2]+" = "+(numarr[add1]+numarr[add2])+"}";
+				numarr[add1] = numarr[add1] + numarr[add2];
+				new dojox.gfx.Moveable(numbersgrp[add1]);
+			}
+			
+			//perform subtraction
+			if (sub1 != null && sub2 != null) {
+				numbersgrp[sub1].clear();
+				numbersgrp[sub2].clear();
+				numbersgrp[sub1] = null;
+				numbersgrp[sub2] = null;
+				numrect[sub1] = null;
+				numrect[sub2] = null;
+				numstatus[sub2] = 0;
+				numstatus[sub1] = 2;
+				numbersgrp[sub1] = surface.createGroup();
+				
+				if (numarr[sub1] - numarr[sub2] >= 100) {
+					fsize = 14;
+				} else {
+					fsize = 20;
+				}
+				
+				numrect[sub1] = numbersgrp[sub1].createRect({x: 190, y: 117, width: 45, height: 45, r: 10})
+						.setFill("#AA99FF")
+						.setStroke({width:"2px", color:"black"});
+						
+				numbersgrp[sub1].createText({x: 195, y: 152, text:numarr[sub1]-numarr[sub2]})
+						.setFont({family:"Arial", size:fsize+"pt", weight:"bold"})
+						.setFill("black");
+				calculation += "{"+numarr[sub1]+" - "+numarr[sub2]+" = "+(numarr[sub1]-numarr[sub2])+"}";
+				numarr[sub1] = numarr[sub1] - numarr[sub2];
+				new dojox.gfx.Moveable(numbersgrp[sub1]);
+			}
+			
+			//perform multiplication
+			if (mul1 != null && mul2 != null) {
+				numbersgrp[mul1].clear();
+				numbersgrp[mul2].clear();
+				numbersgrp[mul1] = null;
+				numbersgrp[mul2] = null;
+				numrect[mul1] = null;
+				numrect[mul2] = null;
+				numstatus[mul2] = 0;
+				numstatus[mul1] = 2;
+				numbersgrp[mul1] = surface.createGroup();
+				
+				if (numarr[mul1] * numarr[mul2] >= 100) {
+					fsize = 14;
+				} else {
+					fsize = 20;
+				}
+				
+				numrect[mul1] = numbersgrp[mul1].createRect({x: 190, y: 217, width: 45, height: 45, r: 10})
+						.setFill("#AA99FF")
+						.setStroke({width:"2px", color:"black"});
+						
+				numbersgrp[mul1].createText({x: 195, y: 252, text:numarr[mul1]*numarr[mul2]})
+						.setFont({family:"Arial", size:fsize+"pt", weight:"bold"})
+						.setFill("black");
+				calculation += "{"+numarr[mul1]+" x "+numarr[mul2]+" = "+(numarr[mul1]*numarr[mul2])+"}";
+				numarr[mul1] = numarr[mul1] * numarr[mul2];
+				new dojox.gfx.Moveable(numbersgrp[mul1]);
+			}
+			
+			//perform division
+			if (div1 != null && div2 != null) {
+				numbersgrp[div1].clear();
+				numbersgrp[div2].clear();
+				numbersgrp[div1] = null;
+				numbersgrp[div2] = null;
+				numrect[div1] = null;
+				numrect[div2] = null;
+				numstatus[div2] = 0;
+				numstatus[div1] = 2;
+				numbersgrp[div1] = surface.createGroup();
+				
+				var dres = numarr[div1] / numarr[div2];
+				dres *= 100;
+				dres = Math.round(dres) / 100;
+				
+				calculation += "{"+numarr[div1]+" / "+numarr[div2]+" = "+dres+"}";
+				
+				if (dres >= 100) {
+					fsize = 14;
+				} else if (dres % 1 != 0) {
+					fsize = 10;
+				} else {
+					fsize = 20;
+				}
+				
+				numrect[div1] = numbersgrp[div1].createRect({x: 190, y: 317, width: 45, height: 45, r: 10})
+						.setFill("#AA99FF")
+						.setStroke({width:"2px", color:"black"});
+									
+				numbersgrp[div1].createText({x: 195, y: 352, text:dres})
+						.setFont({family:"Arial", size:fsize+"pt", weight:"bold"})
+						.setFill("black");
+				numarr[div1] = dres;
+				new dojox.gfx.Moveable(numbersgrp[div1]);
+			}
+			
+			if (pow1 != null && pow2 != null) {
+				numbersgrp[pow1].clear();
+				numbersgrp[pow2].clear();
+				numbersgrp[pow1] = null;
+				numbersgrp[pow2] = null;
+				numrect[pow1] = null;
+				numrect[pow2] = null;
+				numstatus[pow2] = 0;
+				numstatus[pow1] = 2;
+				numbersgrp[pow1] = surface.createGroup();
+				
+				if (Math.pow(numarr[pow1],numarr[pow2]) >= 1000) {
+					fsize = 10;
+				} else if (Math.pow(numarr[pow1],numarr[pow2]) >= 100) {
+					fsize = 14;
+				} else {
+					fsize = 20;
+				}
+				
+				numrect[pow1] = numbersgrp[pow1].createRect({x: 472, y: 32, width: 45, height: 45, r: 10})
+						.setFill("#AA99FF")
+						.setStroke({width:"2px", color:"black"});
+						
+				numbersgrp[pow1].createText({x: 477, y: 67, text:Math.pow(numarr[pow1],numarr[pow2])})
+						.setFont({family:"Arial", size:fsize+"pt", weight:"bold"})
+						.setFill("black");
+				
+				calculation += "{"+numarr[pow1]+" ^ "+numarr[pow2]+" = "+(Math.pow(numarr[pow1],numarr[pow2]))+"}";				
+				
+				numarr[pow1] = Math.pow(numarr[pow1],numarr[pow2]);
+				new dojox.gfx.Moveable(numbersgrp[pow1]);
+			}
+
+		}
+		
+		function resetNums() {
+			for (i=0; i<6; i++) {
+				numarr[i] = numorig[i];
+				if (numstatus[i] != 0) {
+					numbersgrp[i].clear();
+					numbersgrp[i] = null;
+					numrect[i] = null;
+					numbersgrp[i] = surface.createGroup();
+					
+				}
+				numstatus[i] = 1;
+				numbersgrp[i] = surface.createGroup();
+				numrect[i] = numbersgrp[i].createRect({x: 300+(i*50), y: 200, width: 45, height: 45, r: 10})
+						.setFill("#AA99FF")
+						.setStroke({width:"2px", color:"black"});
+						
+				numbersgrp[i].createText({x: 305+(i*50), y: 235, text:numarr[i]})
+						.setFont({family:"Arial", size:"20pt", weight:"bold"})
+						.setFill("black");
+						
+				new dojox.gfx.Moveable(numbersgrp[i]);
+				calculation = "{";
+			}
+		}
+		
+		function submitAnswer() {
+			for (i=0; i<6; i++) {
+				if (numstatus[i] != 0) {
+					var temp = numbersgrp[i].children[0].getTransformedBoundingBox();
+					temp = temp[0];
+					//alert("Shape:"+i+",X:"+temp.x+",Y:"+temp.y);
+					if (temp.x >= 520 && temp.x <= 525 && temp.y >= 305 && temp.y <= 310) {
+						testNumber(numarr[i]);
+					}
+				}
+			}
+		}
+		
+		function testNumber(testnum) {
+			var keepgoing = true;
+			//alert(calculation);
+			if (target == testnum) {
+				alert("35 points!");
+				keepgoing = false;
+			} else if (testnum >= target - 1 && testnum <= target + 1) {
+				alert ("15 points!");
+				keepgoing = false;
+			} else if (testnum >= target - 2 && testnum <= target + 2) {
+				alert ("5 points!");
+				keepgoing = false;
+			} else if (testnum >= target - 5 && testnum <= target + 5) {
+				alert ("2 points!");
+				keepgoing = false;
+			} else if (testnum >= target - 10 && testnum <= target + 10) {
+				alert ("1 point!");
+				keepgoing = false;
+			} else {
+				alert ("Your number isn't close enough to earn points.  Try again!");
+			}
+			
+			if (keepgoing == false) {
+				location.reload();
+			}
+		}
+	</script>
+</head>
+<body>
+<table><tbody><tr>
+	<td style="vertical-align:top;">
+		<table cellspacing="0" border="1" style="width:250px; font-size:8pt;"><tbody><tr>
+			<th colspan="2" style="background-color:#DDDDDD;">Instructions:</th>
+		</tr><tr>
+			<td>
+			<ol>
+				<li>Pick six numbers using either the <b>large number</b> or <b>small number</b> button below.</li>
+				<li>Try to calculate the target value by dragging your numbers into the white boxes to perform addition, subtraction, multiplication, division and powers.  Click the <b>calculate</b> button to have the computer work out the answers to your calculations.  Your original numbers will disappear, and the answer will remain.</li>
+				<li>When you have an answer, drag it to the white box in the <b>target section</b> and click the <b>use number</b> button to earn points for your answer</li>
+				<li>If you wish to start over, click on the <b>reset</b> button to restore the original 6 numbers</li>
+			</ol>
+			</td>
+		</tr></tbody></table>
+		
+		<table cellspacing="0" border="1" style="width:250px; font-size:8pt;"><tbody><tr>
+			<th colspan="2" style="background-color:#DDDDDD;">Add a Number:</th>
+		</tr><tr>
+		<td style="text-align:center;">
+			<button id="ln" onclick="addNumber(1);">Large Number</button><br>
+			<button id="sn" onclick="addNumber(0);">Small Number</button>
+		</td>
+		</tr></tbody></table>
+		<table cellspacing="0" border="1" style="width:250px; font-size:8pt;"><tbody><tr>
+			<th colspan="2" style="background-color:#DDDDDD;">Points:</th>
+		</tr><tr>
+			<td>Exactly Correct:</td>
+			<td>35 points</td>
+		</tr><tr>
+			<td>Off by 1:</td>
+			<td>15 points</td>
+		</tr><tr>
+			<td>Off by 2:</td>
+			<td>5 points</td>
+		</tr><tr>		
+			<td>Off by up to 5:</td>
+			<td>2 points</td>
+		</tr><tr>		
+			<td>Off by up to 10:</td>
+			<td>1 point</td>
+		</tr></tbody></table>
+	</td>
+	<td>
+		<center><h2>Countdown (Numbers Version)</h2></center>
+		<center>
+			<button onclick="calculateNums();" disabled="" id="calc">Calculate</button>
+			<button onclick="resetNums();" disabled="" id="creset">Reset</button>
+		</center>
+		<div id="cnumbers">
+		
+		<svg overflow="hidden" width="800" height="500"><defs></defs><g><rect fill="rgb(136, 255, 221)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="0" y="0" width="260" height="80" ry="30" rx="30" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><rect fill="rgb(255, 255, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="10" y="15" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><text fill="rgb(0, 0, 0)" fill-opacity="1" stroke="none" stroke-opacity="0" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="65" y="60" text-anchor="start" text-decoration="none" rotate="0" kerning="auto" text-rendering="optimizeLegibility" font-style="normal" font-variant="normal" font-weight="bold" font-size="36pt" font-family="Arial" fill-rule="evenodd">+</text><rect fill="rgb(255, 255, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="100" y="15" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><text fill="rgb(0, 0, 0)" fill-opacity="1" stroke="none" stroke-opacity="0" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="155" y="60" text-anchor="start" text-decoration="none" rotate="0" kerning="auto" text-rendering="optimizeLegibility" font-style="normal" font-variant="normal" font-weight="bold" font-size="36pt" font-family="Arial" fill-rule="evenodd">=</text><rect fill="rgb(187, 187, 187)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="190" y="15" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect></g><g><rect fill="rgb(136, 221, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="0" y="100" width="260" height="80" ry="30" rx="30" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><rect fill="rgb(255, 255, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="10" y="115" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><text fill="rgb(0, 0, 0)" fill-opacity="1" stroke="none" stroke-opacity="0" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="70" y="160" text-anchor="start" text-decoration="none" rotate="0" kerning="auto" text-rendering="optimizeLegibility" font-style="normal" font-variant="normal" font-weight="bold" font-size="36pt" font-family="Arial" fill-rule="evenodd">-</text><rect fill="rgb(255, 255, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="100" y="115" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><text fill="rgb(0, 0, 0)" fill-opacity="1" stroke="none" stroke-opacity="0" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="155" y="160" text-anchor="start" text-decoration="none" rotate="0" kerning="auto" text-rendering="optimizeLegibility" font-style="normal" font-variant="normal" font-weight="bold" font-size="36pt" font-family="Arial" fill-rule="evenodd">=</text><rect fill="rgb(187, 187, 187)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="190" y="115" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect></g><g><rect fill="rgb(221, 255, 136)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="0" y="200" width="260" height="80" ry="30" rx="30" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><rect fill="rgb(255, 255, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="10" y="215" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><text fill="rgb(0, 0, 0)" fill-opacity="1" stroke="none" stroke-opacity="0" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="65" y="260" text-anchor="start" text-decoration="none" rotate="0" kerning="auto" text-rendering="optimizeLegibility" font-style="normal" font-variant="normal" font-weight="bold" font-size="36pt" font-family="Arial" fill-rule="evenodd">x</text><rect fill="rgb(255, 255, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="100" y="215" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><text fill="rgb(0, 0, 0)" fill-opacity="1" stroke="none" stroke-opacity="0" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="155" y="260" text-anchor="start" text-decoration="none" rotate="0" kerning="auto" text-rendering="optimizeLegibility" font-style="normal" font-variant="normal" font-weight="bold" font-size="36pt" font-family="Arial" fill-rule="evenodd">=</text><rect fill="rgb(187, 187, 187)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="190" y="215" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect></g><g><rect fill="rgb(255, 221, 136)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="0" y="300" width="260" height="80" ry="30" rx="30" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><rect fill="rgb(255, 255, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="10" y="315" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><text fill="rgb(0, 0, 0)" fill-opacity="1" stroke="none" stroke-opacity="0" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="65" y="360" text-anchor="start" text-decoration="none" rotate="0" kerning="auto" text-rendering="optimizeLegibility" font-style="normal" font-variant="normal" font-weight="bold" font-size="36pt" font-family="Arial" fill-rule="evenodd">ק</text><rect fill="rgb(255, 255, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="100" y="315" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><text fill="rgb(0, 0, 0)" fill-opacity="1" stroke="none" stroke-opacity="0" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="155" y="360" text-anchor="start" text-decoration="none" rotate="0" kerning="auto" text-rendering="optimizeLegibility" font-style="normal" font-variant="normal" font-weight="bold" font-size="36pt" font-family="Arial" fill-rule="evenodd">=</text><rect fill="rgb(187, 187, 187)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="190" y="315" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect></g><g><rect fill="rgb(255, 136, 221)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="300" y="0" width="240" height="110" ry="30" rx="30" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><rect fill="rgb(255, 255, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="320" y="55" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><rect fill="rgb(255, 255, 255)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="370" y="5" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect><text fill="rgb(0, 0, 0)" fill-opacity="1" stroke="none" stroke-opacity="0" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="430" y="75" text-anchor="start" text-decoration="none" rotate="0" kerning="auto" text-rendering="optimizeLegibility" font-style="normal" font-variant="normal" font-weight="bold" font-size="36pt" font-family="Arial" fill-rule="evenodd">=</text><rect fill="rgb(187, 187, 187)" fill-opacity="1" stroke="rgb(0, 0, 0)" stroke-opacity="1" stroke-width="2px" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="470" y="30" width="50" height="50" ry="10" rx="10" fill-rule="evenodd" stroke-dasharray="none" dojoGfxStrokeStyle="solid"></rect></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg></div>
+	</td>
+	<td></td>
+</tr></tbody></table>
+<button id="checkans" style="visibility:hidden; position:absolute; left:850px; top:405px;" onclick="submitAnswer();">Use Number</button>
+
+
+
+</body></html>
